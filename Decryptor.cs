@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using SQLCipher3Simple;
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SQLCipherDecryptor
+namespace SQLCipher3Simple
 {
     public class Decryptor
     {
