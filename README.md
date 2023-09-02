@@ -1,19 +1,23 @@
 # SQLCipherv3 Library/Tool
 
 ## Overview
-SQLCipherDecryptor is a .NET library designed to handle decryption of SQLCipher-encrypted databases. It includes both synchronous and asynchronous methods to decrypt and encrypt SQLCipher version 3.x databases. It offers utility functions to derive encryption and HMAC keys, validate decrypted headers, and more. This library employs parallelism, which allows the decryption operation to run relatively fast (~500ms).
+SQLCipherDecryptor is a .NET library designed to handle decryption of SQLCipher-de/encrypted databases. It includes both synchronous and asynchronous methods to decrypt and encrypt SQLCipher version 3.x databases. It offers utility functions to derive encryption and HMAC keys, validate decrypted headers, and more. This library employs parallelism, which allows the decryption operation to run relatively fast (~500ms).
 
 ## Features
 - Supports SQLCipher 3.x databases.
 - Synchronous and Asynchronous decryption methods.
-- Utility functions for key derivation, HMAC validation, and more.
+- Synchronous encryption methods.
+- Utility functions for key derivation, HMAC validation, and more. For encryption, change the values in the PRAGMA fields.
 - Page-level decryption.
 - HMAC verification for encrypted pages.
 - Thorough error handling.
 
 ## Usage
 You can use the application provided in the release tab.
-```SQLCipherDecryptor <input_file_path> <output_file_path> <password>```
+- Decrypting
+```SQLCipherDecryptor -d <input_file_path> <output_file_path> <password>```
+- Encrypting
+```SQLCipherDecryptor -e <input_file_path> <output_file_path> <password>```
 
 Alternatively, you can use the library branch.
 ### Synchronous
@@ -24,6 +28,7 @@ DecryptDefault(string sourceFileName, string outputFileName, string passwordStri
 ```c#
 await DecryptDefaultAsync(string sourceFileName, string outputFileName, string passwordString);
 ```
+
 ## Limitations
 - Only works for SQLCipher v3.0
 - Low-level of customization:
@@ -34,4 +39,6 @@ await DecryptDefaultAsync(string sourceFileName, string outputFileName, string p
   -  Plaintext header size is 0
 
 ## Contributing
-This code was wholly written by me, but fully translated from Python. An enormous thank you to [@bssthu](https://github.com/bssthu), who wrote [pysqlsimplecipher](https://github.com/bssthu/pysqlsimplecipher). I have based my code largely off of this repository, with some modifications for it to be compatible with C#.
+This code was wholly written by me (Mako864), but fully translated from Python. An enormous thank you to [@bssthu](https://github.com/bssthu), who wrote [pysqlsimplecipher](https://github.com/bssthu/pysqlsimplecipher). I have based my code largely off of this repository, with some modifications for it to be compatible with C#.
+
+The encryption library was added by KaryonixX, which is based on the SQLitePCL library and adds the compatibility to encrypt SQLite databases using the SQLCipher3 standard.

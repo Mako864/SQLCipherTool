@@ -60,21 +60,41 @@ namespace SQLCipherDecryptor
         {
             try
             {
-                if (args.Length < 3)
+                if (args.Length < 4)
                 {
-                    Console.WriteLine("Usage: SQLCipherDecryptor <input_file_path> <output_file_path> <password>");
+                    Console.WriteLine("Usage:");
+                    Console.WriteLine("Encrypt: -e <input_file_path> <output_file_path> <password>");
+                    Console.WriteLine("Decrypt: -d <input_file_path> <output_file_path> <password>");
                     return;
                 }
 
-                string inputFilePath = args[0];
-                string outputFilePath = args[1];
-                string password = args[2];
+                string flag = args[0];
 
-                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                if (flag == "-d")
+                {
+                    string inputFilePath = args[1];
+                    string outputFilePath = args[2];
+                    string password = args[3];
 
-                await DecryptFile(inputFilePath, passwordBytes, outputFilePath);
+                    byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
-                Console.WriteLine("Decryption completed.");
+                    await DecryptFile(inputFilePath, passwordBytes, outputFilePath);
+
+                    Console.WriteLine("Decryption completed.");
+                }
+                else if (flag == "-e")
+                {
+                    string inputDbFilePath = args[1];
+                    string outputDbFilePath = args[2];
+                    string encryptionKey = args[3];
+
+                    Encryptor.EncryptDatabase(inputDbFilePath, outputDbFilePath, encryptionKey);
+
+                }
+                else
+                {
+                    Console.WriteLine("Invalid flag. Use -e for encryption and -d for decryption.");
+                }
             }
             catch (Exception ex)
             {
@@ -83,3 +103,6 @@ namespace SQLCipherDecryptor
         }
     }
 }
+
+
+
