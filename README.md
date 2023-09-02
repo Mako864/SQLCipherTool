@@ -1,7 +1,7 @@
-# SQLCipherv3Decryptor
+# SQLCipherv3 Library/Tool
 
 ## Overview
-SQLCipherDecryptor is a .NET library designed to handle decryption of SQLCipher-encrypted databases. It includes both synchronous and asynchronous methods to decrypt SQLCipher version 3.x databases. It offers utility functions to derive encryption and HMAC keys, validate decrypted headers, and more. This library employs parallelism, which allows the decryption oepration to run incredibly fast (~500ms).
+SQLCipherDecryptor is a .NET library designed to handle decryption of SQLCipher-encrypted databases. It includes both synchronous and asynchronous methods to decrypt and encrypt SQLCipher version 3.x databases. It offers utility functions to derive encryption and HMAC keys, validate decrypted headers, and more. This library employs parallelism, which allows the decryption operation to run relatively fast (~500ms).
 
 ## Features
 - Supports SQLCipher 3.x databases.
