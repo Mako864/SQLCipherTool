@@ -1,43 +1,59 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace SQLCipherDecryptor
 {
     class Program
     {
-        public static async Task Decrypt(string inputFilePath, string outputFilePath, string password)
+        public static async Task DecryptFile(string filenameIn, byte[] password, string filenameOut)
         {
-            byte[] salt = new byte[16];
-            byte[] encryptionKey = new byte[32];
-            byte[] hmacKey = new byte[20];
-
-            // Read salt and derive keys
-            using (FileStream fs = new(inputFilePath, FileMode.Open, FileAccess.Read))
+            try
             {
-                fs.Seek(16, SeekOrigin.Begin);
-                fs.Read(salt, 0, 16);
+                // Validate arguments
+                if (filenameIn == null || !(filenameIn is string))
+                {
+                    throw new InvalidOperationException("filenameIn must be a string.");
+                }
+                if (password == null || !(password is byte[]))
+                {
+                    throw new InvalidOperationException("password must be a byte array.");
+                }
+                if (filenameOut == null || !(filenameOut is string))
+                {
+                    throw new InvalidOperationException("filenameOut must be a string.");
+                }
+
+                // Log the start of the decryption process and input parameters
+                Console.WriteLine("Starting decryption.");
+                Console.WriteLine($"Input File: {filenameIn}");
+                Console.WriteLine($"Output File: {filenameOut}");
+
+                // Read encrypted file
+                byte[] raw;
+                using (FileStream fs = new(filenameIn, FileMode.Open, FileAccess.Read))
+                {
+                    raw = new byte[fs.Length];
+                    await fs.ReadAsync(raw, 0, (int)fs.Length);
+                }
+
+                // Decrypt
+                byte[] dec = CryptoHelper.DecryptDefault(raw, password);
+
+                Console.WriteLine("Decryption completed. Writing to output file.");
+
+                // Write decrypted file
+                using (FileStream fs = new FileStream(filenameOut, FileMode.Create, FileAccess.Write))
+                {
+                    await fs.WriteAsync(dec, 0, dec.Length);
+                }
+
+                // Log completion
+                Console.WriteLine("Decryption and output file writing completed successfully.");
             }
-
-            using (Rfc2898DeriveBytes pbkdf2 = new(System.Text.Encoding.UTF8.GetBytes(password), salt, 64000, HashAlgorithmName.SHA1))
+            catch (Exception ex)
             {
-                byte[] masterKey = pbkdf2.GetBytes(64);
-                Array.Copy(masterKey, 0, encryptionKey, 0, 32);
-                Array.Copy(masterKey, 32, hmacKey, 0, 20);
-            }
-
-
-            using FileStream fsInput = new(inputFilePath, FileMode.Open, FileAccess.Read);
-            using FileStream fsOutput = new(outputFilePath, FileMode.Create, FileAccess.Write);
-            fsInput.Seek(16 + 16, SeekOrigin.Begin);  // Skip the first 32 bytes (Salt and header)
-
-            byte[] encryptedPage = new byte[1024 + 20 + 16];  // Page size + HMAC + IV
-            byte[] decryptedPage;
-
-            int pageNum = 1;
-            while (fsInput.Read(encryptedPage, 0, encryptedPage.Length) > 0)
-            {
-                decryptedPage = CryptoHelper.DecryptPage(encryptedPage, encryptionKey, hmacKey, pageNum);
-                fsOutput.Write(decryptedPage, 0, decryptedPage.Length);
-                pageNum++;
+                // Log any exceptions
+                Console.WriteLine($"An error occurred: {ex}");
             }
         }
 
@@ -45,17 +61,23 @@ namespace SQLCipherDecryptor
         {
             try
             {
-                if (args.Length < 3)
-                {
-                    Console.WriteLine("Usage: SQLCipherDecryptor <input_file_path> <output_file_path> <password>");
-                    return;
-                }
+                //if (args.Length < 3)
+                //{
+                //    Console.WriteLine("Usage: SQLCipherDecryptor <input_file_path> <output_file_path> <password>");
+                //    return;
+                //}
 
-                string inputFilePath = args[0];
-                string outputFilePath = args[1];
-                string password = args[2];
+                //string inputFilePath = args[0];
+                //string outputFilePath = args[1];
+                //string password = args[2];
 
-                await Decrypt(inputFilePath, outputFilePath, password);
+                string inputFilePath = "C:\\Users\\mikha\\Desktop\\ChromaCS\\bin\\Debug\\net6.0\\dbs\\dataenc_glb.db";
+                string outputFilePath = "C:\\Users\\mikha\\Desktop\\ChromaCS\\bin\\Debug\\net6.0\\dbs\\glb.db";
+                string password = "9bf9c6ed9d537c399a6c4513e92ab24717e1a488381e3338593abd923fc8a13b";
+
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+                await DecryptFile(inputFilePath, passwordBytes, outputFilePath);
 
                 Console.WriteLine("Decryption completed.");
             }
