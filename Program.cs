@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 
 namespace SQLCipherDecryptor
 {
@@ -42,7 +41,7 @@ namespace SQLCipherDecryptor
                 Console.WriteLine("Decryption completed. Writing to output file.");
 
                 // Write decrypted file
-                using (FileStream fs = new FileStream(filenameOut, FileMode.Create, FileAccess.Write))
+                using (FileStream fs = new(filenameOut, FileMode.Create, FileAccess.Write))
                 {
                     await fs.WriteAsync(dec, 0, dec.Length);
                 }
@@ -61,19 +60,15 @@ namespace SQLCipherDecryptor
         {
             try
             {
-                //if (args.Length < 3)
-                //{
-                //    Console.WriteLine("Usage: SQLCipherDecryptor <input_file_path> <output_file_path> <password>");
-                //    return;
-                //}
+                if (args.Length < 3)
+                {
+                    Console.WriteLine("Usage: SQLCipherDecryptor <input_file_path> <output_file_path> <password>");
+                    return;
+                }
 
-                //string inputFilePath = args[0];
-                //string outputFilePath = args[1];
-                //string password = args[2];
-
-                string inputFilePath = "C:\\Users\\mikha\\Desktop\\ChromaCS\\bin\\Debug\\net6.0\\dbs\\dataenc_glb.db";
-                string outputFilePath = "C:\\Users\\mikha\\Desktop\\ChromaCS\\bin\\Debug\\net6.0\\dbs\\glb.db";
-                string password = "9bf9c6ed9d537c399a6c4513e92ab24717e1a488381e3338593abd923fc8a13b";
+                string inputFilePath = args[0];
+                string outputFilePath = args[1];
+                string password = args[2];
 
                 byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
@@ -83,7 +78,7 @@ namespace SQLCipherDecryptor
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.ToString()}");
+                Console.WriteLine($"An error occurred: {ex}");
             }
         }
     }

@@ -18,10 +18,10 @@ namespace SQLCipherDecryptor
                 ICryptoTransform decryptor = aes.CreateDecryptor();
 
                 byte[] decryptedData;
-                using (MemoryStream msDecrypt = new MemoryStream(raw))
+                using (MemoryStream msDecrypt = new(raw))
                 {
-                    using CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
-                    using MemoryStream ms = new MemoryStream();
+                    using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
+                    using MemoryStream ms = new();
                     byte[] buffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = csDecrypt.Read(buffer, 0, buffer.Length)) > 0)
@@ -97,33 +97,31 @@ namespace SQLCipherDecryptor
         public static (byte[], byte[]) KeyDerive(byte[] salt, byte[] password, int saltMask, int keySz, int keyIter, int hmacKeySz, int hmacKeyIter)
         {
             // Derive the encryption key
-            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, keyIter, HashAlgorithmName.SHA1))
+            using Rfc2898DeriveBytes pbkdf2 = new(password, salt, keyIter, HashAlgorithmName.SHA1);
+            byte[] key = pbkdf2.GetBytes(keySz);
+
+            // XOR the salt with saltMask to create HMAC salt
+            byte[] hmacSalt = new byte[salt.Length];
+            for (int i = 0; i < salt.Length; i++)
             {
-                byte[] key = pbkdf2.GetBytes(keySz);
-
-                // XOR the salt with saltMask to create HMAC salt
-                byte[] hmacSalt = new byte[salt.Length];
-                for (int i = 0; i < salt.Length; i++)
-                {
-                    hmacSalt[i] = (byte)(salt[i] ^ saltMask);
-                }
-
-                // Derive the HMAC key
-                byte[] hmacKey;
-                using (var pbkdf2Hmac = new Rfc2898DeriveBytes(key, hmacSalt, hmacKeyIter, HashAlgorithmName.SHA1))
-                {
-                    hmacKey = pbkdf2Hmac.GetBytes(hmacKeySz);
-                }
-
-                return (key, hmacKey);
+                hmacSalt[i] = (byte)(salt[i] ^ saltMask);
             }
+
+            // Derive the HMAC key
+            byte[] hmacKey;
+            using (Rfc2898DeriveBytes pbkdf2Hmac = new(key, hmacSalt, hmacKeyIter, HashAlgorithmName.SHA1))
+            {
+                hmacKey = pbkdf2Hmac.GetBytes(hmacKeySz);
+            }
+
+            return (key, hmacKey);
         }
 
         public static byte[] GenerateHMAC(byte[] hmacKey, byte[] content, int pageNo)
         {
             using HMACSHA1 hmac = new(hmacKey);
-            byte[] pageNoBytes = BitConverter.GetBytes(pageNo);
-            if (BitConverter.IsLittleEndian)
+            byte[] pageNoBytes = BitConverter.GetBytes((uint)pageNo);  // Convert to unsigned int
+            if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(pageNoBytes);
             }
