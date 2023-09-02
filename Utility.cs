@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace SQLCipherDecryptor
+namespace SQLCipher3Simple
 {
     internal class Utility
     {

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SQLCipherDecryptor
+namespace SQLCipher3Simple
 {
     class Program
     {
@@ -36,7 +36,7 @@ namespace SQLCipherDecryptor
                 }
 
                 // Decrypt
-                byte[] dec = CryptoHelper.DecryptDefault(raw, password);
+                byte[] dec = Decryptor.DecryptDefault(raw, password);
 
                 Console.WriteLine("Decryption completed. Writing to output file.");
 

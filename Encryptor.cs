@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace SQLCipherDecryptor
+namespace SQLCipher3Simple
 {
     public class Encryptor
     {
